@@ -1,0 +1,158 @@
+Actions Class
+
+package Basic_Autoamtion;
+
+import java.util.concurrent.TimeUnit;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.interactions.Action;
+import org.openqa.selenium.interactions.Actions;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
+
+public class Actions_Class {
+
+WebDriver Driver;
+
+@BeforeTest
+public void Setup() {
+
+System.setProperty("webdriver.chrome.driver", "chromedriver.exe");
+Driver = new ChromeDriver();
+Driver.manage().window().maximize();
+Driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+Driver.get("https://demoqa.com/droppable/");
+Driver.getTitle();
+System.out.println("Title of the Page: " +Driver.getTitle());
+}
+
+@Test (priority=0, enabled=false)
+public void DragAndDrop() {
+
+WebElement From= Driver.findElement(By.cssSelector("div#draggable"));
+WebElement To= Driver.findElement(By.cssSelector("div#droppables"));
+
+Actions builder= new Actions (Driver);
+
+builder.clickAndHold(From).moveToElement(To).release(To).build().perform();
+
+String textTo= To.getText();
+if (textTo.equals("Dropped!")) {
+System.out.println("Passed: Element is dropped on target as expected");}
+else {
+System.out.println("Failed: Element couldn't be dropped to the target as expected");
+}
+}
+
+@Test(priority=1, dependsOnMethods= {"DragAndDrop"}, enabled=false)
+public void Keys() {
+Driver = new ChromeDriver();
+Driver.get("https://www.facebook.com/");
+WebElement Email= Driver.findElement(By.id("email"));
+
+
+Actions builder= new Actions (Driver);
+Action seriesofActions= builder
+.moveToElement(Email)
+.click()
+.keyDown(Email, Keys.SHIFT)
+.sendKeys(Email, "jondoe52")
+.keyUp(Email, Keys.SHIFT)
+.doubleClick()
+.build();
+
+seriesofActions.perform();
+}
+
+
+@Test
+public void UpperCase() {
+Driver = new ChromeDriver();
+Driver.get("https://www.facebook.com/");
+WebElement Email= Driver.findElement(By.id("email"));
+Email.sendKeys(Keys.chord(Keys.SHIFT, "eric johnson", Keys.CONTROL, "a"), Keys.DELETE);
+
+
+}
+}
+
+
+Nested Frame Handling (File is attached for practice)
+
+
+package Basic_Autoamtion;
+
+import java.util.concurrent.TimeUnit;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
+
+public class Nested_Frame_Handling {
+
+
+WebDriver Driver;
+@BeforeTest
+public void Setup() throws InterruptedException {
+System.setProperty("webdriver.chrome.driver", "chromedriver.exe");
+Driver = new ChromeDriver();
+Driver.manage().window().maximize();
+Driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+Driver.get("D:\\QA Study\\Handler\\framenested1.htm");
+Driver.getTitle();
+System.out.println("Title of the Page: " +Driver.getTitle());
+
+}
+
+
+@Test
+public void Logging_in() {
+
+Driver.switchTo().frame("iframe2");
+Driver.switchTo().frame("iframe3");
+
+Driver.findElement(By.xpath("//*[@name='userName']")).sendKeys("Casey Burger");
+Driver.findElement(By.cssSelector("input[name='usePwd']")).sendKeys("Cas1143");
+
+
+Driver.switchTo().parentFrame();
+Driver.findElement(By.name("Login")).click();
+
+Driver.findElement(By.name("Login")).isEnabled();
+System.out.println("Is the login Button Visible? " + Driver.findElement(By.name("Login")).isEnabled());
+
+
+
+Driver.switchTo().defaultContent();
+Driver.close();
+}
+}
+
+
+
+Class Notes
+
+What is Actions Class?
+Actions class is an ability provided by selenium for handling Keyboard and Mouse events. Primarily mimicking Keyboard and Mouse actions.
+
+*What is an Action Class?
+*Action is an interface which allows a single user interaction action to be executed.
+
+~SeriesofActions: This is a set/container to hold all the actions to be performed together.
+
+**build(): is a method to create a chain of actions in the actions class.
+**perform(): is a method to execute a chain of actions which are built using the actions build() method.
+
+
+What is Keys.chord()?
+This is a method to press multiple keys simultaneously/at the same time.
+
+
+
+switchTo.frame(frameNo)- This method allows the user to switch to a frame using frame no.
